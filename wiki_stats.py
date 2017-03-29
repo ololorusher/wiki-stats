@@ -20,7 +20,8 @@ class WikiGraph:
         print('Загружаю граф из файла: ' + filename)
 
         with open(filename) as f:
-            (n, _nlinks) = (0, 0) # TODO: прочитать из файла
+            readsplit=f.read().split()
+            (n, _nlinks) = [int(x) for x in (readsplit[0], readsplit[1])]
             
             self._titles = []
             self._sizes = array.array('L', [0]*n)
@@ -28,15 +29,37 @@ class WikiGraph:
             self._redirect = array.array('B', [0]*n)
             self._offset = array.array('L', [0]*(n+1))
 
-            # TODO: прочитать граф из файла
+           #read from file
+            i=5
+            j=0
+            while i<len(readsplit):
+                k=i+int(readsplit[i])
+                tmp=[int(x) for x in readsplit[i+1:k+1]]
+                for s in tmp:
+                    self._links[j] = s
+                    j+=1
+                i=k+4
+
+            j=1
+            i=3
+            f=0
+            self._offset[0]=0
+            while j<=n:
+                self._offset[j]=self._offset[j-1]+int(readsplit[i+2])
+                self._titles.append(readsplit[i-1])
+                self._redirect[f] =int(readsplit[i+1])
+                self._sizes[f]=int(readsplit[i])
+                f+=1
+                i+= int(readsplit[i+2])
+                j+=1
 
         print('Граф загружен')
 
     def get_number_of_links_from(self, _id):
-        pass
+        return len(self.get_links_from(_id))
 
     def get_links_from(self, _id):
-        pass
+        return self._links[self._offset[_id]:self._offset[_id+1]]
 
     def get_id(self, title):
         pass
